@@ -44,10 +44,22 @@ jobs:
           docker push $BASE:${{ github.sha }}
           docker push $BASE:latest
 
-      - name: Configurar kubectl
+      - name: Configurar kubectl e SSH Tunnel
         run: |
           echo "${{ secrets.MGC_KUBECONFIG }}" | base64 -d > kubeconfig.yaml
-          sed -i 's|201.23.68.8|201.23.68.8|g' kubeconfig.yaml
+          chmod 600 kubeconfig.yaml
+          export KUBECONFIG=$PWD/kubeconfig.yaml
+
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 201.23.68.8 >> ~/.ssh/known_hosts
+
+          ssh -f -N -L 6443:127.0.0.1:6443 -o ServerAliveInterval=60 -o ServerAliveCountMax=3 ubuntu@201.23.68.8
+
+          sleep 5
+
+          kubectl cluster-info
 
       - name: Criar Secret do registry
         run: |
