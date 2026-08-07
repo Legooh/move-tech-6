@@ -46,7 +46,7 @@ jobs:
 
       - name: Configurar kubectl
         run: |
-          echo "${{ secrets.MGC_KUBECONFIG }}" > kubeconfig.yaml
+          echo "${{ secrets.MGC_KUBECONFIG }}" | base64 -d > kubeconfig.yaml
           chmod 600 kubeconfig.yaml
 
       - name: Criar Secret do registry
