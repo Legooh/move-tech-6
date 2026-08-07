@@ -10,6 +10,7 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -28,6 +29,7 @@ jobs:
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
@@ -48,6 +50,17 @@ jobs:
         run: |
           echo "${{ secrets.MGC_KUBECONFIG }}" | base64 -d > kubeconfig.yaml
           chmod 600 kubeconfig.yaml
+
+      - name: Debug kubeconfig
+        run: |
+          echo "Servidor configurado:"
+          grep server kubeconfig.yaml
+
+      - name: Testar conexão com cluster
+        run: |
+          export KUBECONFIG=kubeconfig.yaml
+          kubectl cluster-info
+          kubectl get nodes
 
       - name: Criar Secret do registry
         run: |
@@ -70,6 +83,7 @@ jobs:
           export KUBECONFIG=kubeconfig.yaml
           export MGC_REGISTRY_NAME=${{ secrets.MGC_REGISTRY_NAME }}
           export IMAGE_TAG=${{ github.sha }}
+
           envsubst < k8s/app.yaml | kubectl apply -f -
           kubectl apply -f k8s/hpa.yaml
           kubectl apply -f k8s/servicemonitor.yaml
