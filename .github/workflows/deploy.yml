@@ -51,6 +51,10 @@ jobs:
           echo "${{ secrets.MGC_KUBECONFIG }}" | base64 -d > kubeconfig.yaml
           chmod 600 kubeconfig.yaml
 
+      - name: Ver kubeconfig usado pelo GitHub
+        run: |
+          grep server kubeconfig.yaml
+
       - name: Testar conexão com cluster
         run: |
           export KUBECONFIG=kubeconfig.yaml
