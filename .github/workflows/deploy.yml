@@ -86,5 +86,5 @@ jobs:
 
           envsubst < k8s/app.yaml | kubectl apply -f -
           kubectl apply -f k8s/hpa.yaml
-          kubectl apply -f k8s/servicemonitor.yaml
+          kubectl apply -f k8s/servicemonitor.yaml || true
           kubectl rollout status deployment/cloud-application
