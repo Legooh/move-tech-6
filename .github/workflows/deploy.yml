@@ -51,11 +51,6 @@ jobs:
           echo "${{ secrets.MGC_KUBECONFIG }}" | base64 -d > kubeconfig.yaml
           chmod 600 kubeconfig.yaml
 
-      - name: Debug kubeconfig
-        run: |
-          echo "Servidor configurado:"
-          grep server kubeconfig.yaml
-
       - name: Testar conexão com cluster
         run: |
           export KUBECONFIG=kubeconfig.yaml
